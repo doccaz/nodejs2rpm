@@ -9,6 +9,7 @@ import tarfile
 import shutil
 import time
 import locale
+import codecs
 
 
 def fillChanges(email, message, output):
@@ -51,7 +52,7 @@ def fillSPEC(input_file, sub_dict, docfile, output_file):
     print "Using template: " + input_file
     print "Output will be: " + output_file
     with open(input_file) as f:
-        out = open(output_file, "w")
+        out = codecs.open(output_file, encoding='utf-8', mode="w")
         for line in f:
             found = False
             for k in sub_dict:
