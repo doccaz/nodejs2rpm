@@ -61,7 +61,6 @@ def fillSPEC(input_file, sub_dict, docfile, output_file):
                     print "found variable: " + k
                     break
             if found is True:
-                # pdb.set_trace()
                 if k == "__REQUIRES__":
                     for x in sub_dict[k]:
                         out.write("Requires:\tnpm(" + x + ") >= " +
@@ -125,19 +124,25 @@ metadata = r.json()
 
 if metadata is not None:
     meta_name = metadata['name']
-    if 'license' not in metadata:
-        # according to https://help.github.com/articles/open-source-licensing/,
-        # code published on GITHUB without a defined license is considered
-        # proprietary.
-        meta_license = 'Proprietary'
-    else:
-        meta_license = metadata['license']
     meta_desc = metadata['description']
     meta_latest = metadata['dist-tags']['latest']
     meta_versions = metadata['versions']
     meta_dist_url = meta_versions[meta_latest]['repository']['url']
     meta_dist_tarball = meta_versions[meta_latest]['dist']['tarball']
     meta_dist_sha1 = meta_versions[meta_latest]['dist']['shasum']
+
+    #pdb.set_trace()
+    if 'license' in meta_versions[meta_latest]:
+        meta_license = meta_versions[meta_latest]['license']
+    elif 'license:' in meta_versions[meta_latest]:
+        meta_license = meta_versions[meta_latest]['license:'][0]['type']
+    elif 'licenses' in meta_versions[meta_latest]:
+        meta_license = meta_versions[meta_latest]['licenses'][0]['type']
+    else:
+        # according to https://help.github.com/articles/open-source-licensing/,
+        # code published on GITHUB without a defined license is considered
+        # proprietary.
+        meta_license = 'Proprietary'
 
     if 'dependencies' not in meta_versions[meta_latest]:
         meta_dependencies = []
