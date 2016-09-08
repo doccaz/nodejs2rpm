@@ -64,7 +64,7 @@ def fillSPEC(input_file, sub_dict, docfile, output_file):
                 if k == "__REQUIRES__":
                     for x in sub_dict[k]:
                         out.write("Requires:\tnpm(" + x + ") >= " +
-                                  re.sub('\^', '', re.sub('x', '0', sub_dict[k][x])) +
+                                  re.sub('\^|~', '', re.sub('x', '0', sub_dict[k][x])) +
                                   '\n')
                 elif k == "__DOC__":
                         if docfile != "none":
@@ -172,7 +172,8 @@ for f in meta_dependencies:
 # map the strings to the values to be substituted
 sub_dict = {
     '__VERSION__': meta_latest,
-    '__SUMMARY__': meta_desc,
+    # OBS considers a lowercase first letter in the summary a fatal error. Really!
+    '__SUMMARY__': meta_desc.capitalize(),
     '__LICENSE__': meta_license,
     '__URL__': meta_dist_url,
     '__BASENAME__': meta_name,
