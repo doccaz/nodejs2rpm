@@ -131,9 +131,12 @@ if metadata is not None:
     meta_dist_tarball = meta_versions[meta_latest]['dist']['tarball']
     meta_dist_sha1 = meta_versions[meta_latest]['dist']['shasum']
 
-    #pdb.set_trace()
+    # pdb.set_trace()
     if 'license' in meta_versions[meta_latest]:
-        meta_license = meta_versions[meta_latest]['license']
+        if 'type' in meta_versions[meta_latest]['license']:
+            meta_license = meta_versions[meta_latest]['license']['type']
+        else:
+            meta_license = meta_versions[meta_latest]['license']
     elif 'license:' in meta_versions[meta_latest]:
         meta_license = meta_versions[meta_latest]['license:'][0]['type']
     elif 'licenses' in meta_versions[meta_latest]:
