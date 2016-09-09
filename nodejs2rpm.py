@@ -12,6 +12,14 @@ import locale
 import codecs
 
 
+def is_string(obj):
+    try:
+        obj + ''
+        return True
+    except TypeError:
+        return False
+
+
 def fillChanges(email, message, output):
     # set the locate to english
     locale.setlocale(locale.LC_TIME, "en_US")
@@ -140,7 +148,10 @@ if metadata is not None:
     elif 'license:' in meta_versions[meta_latest]:
         meta_license = meta_versions[meta_latest]['license:'][0]['type']
     elif 'licenses' in meta_versions[meta_latest]:
-        meta_license = meta_versions[meta_latest]['licenses'][0]['type']
+        if is_string(meta_versions[meta_latest]['licenses']):
+            meta_license = meta_versions[meta_latest]['licenses']
+        else:
+            meta_license = meta_versions[meta_latest]['licenses'][0]['type']
     else:
         # according to https://help.github.com/articles/open-source-licensing/,
         # code published on GITHUB without a defined license is considered
