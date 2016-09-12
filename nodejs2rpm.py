@@ -135,7 +135,10 @@ if metadata is not None:
     meta_desc = metadata['description']
     meta_latest = metadata['dist-tags']['latest']
     meta_versions = metadata['versions']
-    meta_dist_url = meta_versions[meta_latest]['repository']['url']
+    if 'repository' not in meta_versions[meta_latest]:
+        meta_dist_url = "UNKNOWN FIXME!"
+    else:
+        meta_dist_url = meta_versions[meta_latest]['repository']['url']
     meta_dist_tarball = meta_versions[meta_latest]['dist']['tarball']
     meta_dist_sha1 = meta_versions[meta_latest]['dist']['shasum']
 
