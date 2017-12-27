@@ -1,5 +1,6 @@
 %define base_name {{ __BASENAME__ }}
-%define nodejs_modulesdir %{_libdir}/node_modules/npm/node_modules
+%define nodejs_dir %{_libdir}/node_modules/npm
+%define nodejs_modulesdir %{nodejs_dir}/node_modules
 
 # to avoid empty debugfiles error on some distros
 %global debug_package %{nil}
@@ -48,7 +49,6 @@ Requires:	npm({{ req }}) >= {{ ver|replace('~', '')|replace('x', '0')|replace('^
 %build
 
 %install
-mkdir -p %{buildroot}%{nodejs_modulesdir}/npm
 mkdir -p %{buildroot}%{nodejs_modulesdir}/%{base_name}
 mv -f package.json \
         %{buildroot}%{nodejs_modulesdir}/%{base_name}
@@ -77,8 +77,8 @@ fi
 
 %files
 %defattr(0644,root,root,-)
+%dir %{nodejs_dir}
 %dir %{nodejs_modulesdir}
-%dir %{nodejs_modulesdir}/npm
 %{nodejs_modulesdir}/%{base_name}/*
 %dir %{nodejs_modulesdir}/%{base_name}
 {%- if __DOC__ != "none" %}

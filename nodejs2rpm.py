@@ -10,7 +10,7 @@ import shutil
 import time
 import locale
 import codecs
-
+import jinja2
 
 def is_string(obj):
     try:
@@ -54,36 +54,24 @@ def getREADME(tar_file):
     return docfile
 
 
-def fillSPEC(input_file, sub_dict, docfile, output_file):
+def fillSPEC(template_file, sub_dict, docfile, output_file):
+
+
+    # Initialize the Jinja environment
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader(options.templatedir))
+
+    template = env.get_template(template_file)
+    result = template.render(sub_dict).encode('utf-8')                          # render template and encode properly
 
     output_file = output_file + '.spec'
-    print "Using template: " + input_file
+    print "Using template: " + template_file
     print "Output will be: " + output_file
-    with open(input_file) as f:
-        out = codecs.open(output_file, encoding='utf-8', mode="w")
-        for line in f:
-            found = False
-            for k in sub_dict:
-                if (re.search(k, line)):
-                    found = True
-                    print "found variable: " + k
-                    break
-            if found is True:
-                if k == "__REQUIRES__":
-                    for x in sub_dict[k]:
-                        out.write("Requires:\tnpm(" + x + ") >= " +
-                                  re.sub('\^|~', '', re.sub('x', '0', sub_dict[k][x])) +
-                                  '\n')
-                elif k == "__DOC__":
-                        if docfile != "none":
-                            out.write("%doc " + docfile)
-                elif k == "__DESCRIPTION__":
-                        out.write(options.boilerplate + '\n' + re.sub(k, sub_dict[k], line) + '\n')
-                else:
-                        out.write(re.sub(k, sub_dict[k], line))
-            else:
-                out.write(line)
-        out.close()
+    outfile = open(output_file, 'wb')                                     # write result to spec file
+    try:
+        outfile.write(result)
+    finally:
+        outfile.close()
+
     print "SPEC done."
 
 
@@ -91,9 +79,12 @@ def fillSPEC(input_file, sub_dict, docfile, output_file):
 parser = OptionParser(version="%prog 1.0")
 parser.add_option("-m", "--module", type="string", dest="module",
                   metavar="NODEJSMODULE", help="name of the NodeJS module")
-parser.add_option("-t", "--template", type="string", dest="template",
+parser.add_option("-t", "--template", type="string", dest="templatefile",
                   help="name of the SPEC template file to use",
-                  metavar="SPECTEMPLATE", default="spec.template")
+                  metavar="SPECTEMPLATE", default="default.spec")
+parser.add_option("-T", "--templatedir", type="string", dest="templatedir",
+                  help="name of the SPEC template directory to use",
+                  metavar="SPECTEMPLATEDIR", default="templates")
 parser.add_option("-f", "--overwrite", action="store_true", dest="overwrite",
                   help="overwrite the destination directory")
 parser.add_option("-e", "--email", type="string", dest="email",
@@ -132,7 +123,7 @@ metadata = r.json()
 
 if metadata is not None:
     meta_name = metadata['name']
-    meta_desc = metadata['description']
+    meta_desc = metadata['description'].rstrip('.')  # remove the trailing dot to avoid a "summary ends in a dot"  OBS warning
     meta_latest = metadata['dist-tags']['latest']
     meta_versions = metadata['versions']
     if 'repository' not in meta_versions[meta_latest]:
@@ -192,18 +183,6 @@ for f in meta_dependencies:
     print "dependency: ", f, " minversion: ", meta_dependencies[f]
 
 
-# map the strings to the values to be substituted
-sub_dict = {
-    '__VERSION__': meta_latest,
-    # OBS considers a lowercase first letter in the summary a fatal error. Really!
-    '__SUMMARY__': meta_desc.capitalize(),
-    '__LICENSE__': meta_license,
-    '__URL__': meta_dist_url,
-    '__BASENAME__': meta_name,
-    '__REQUIRES__': meta_dependencies,
-    '__DOC__': "none",
-    # the metadata does not have a detailed description
-    '__DESCRIPTION__': meta_desc}
 
 # if overwrite is on, remove the directory first
 if options.overwrite is True:
@@ -234,11 +213,26 @@ out.close()
 # get the README file from the tar
 docfile = getREADME(tarball)
 
+# map the strings to the values to be substituted
+sub_dict = {
+    '__VERSION__': meta_latest,
+    # OBS considers a lowercase first letter in the summary a fatal error. Really!
+    '__SUMMARY__': meta_desc.capitalize(),
+    '__LICENSE__': meta_license,
+    '__URL__': meta_dist_url,
+    '__BASENAME__': meta_name,
+    '__REQUIRES__': meta_dependencies,
+    '__DOC__': docfile,
+    '__BOILERPLATE__': boilerplate,
+    # the metadata does not have a detailed description
+    '__DESCRIPTION__': meta_desc }
+
 # substitute the variables in the SPEC template
-fillSPEC(options.template, sub_dict, docfile, output)
+fillSPEC(options.templatefile, sub_dict, docfile, output)
 
 # create the changes file if requested
 fillChanges(options.email, options.changelog, output)
 
 print "Done! Have fun with your new package!"
 sys.exit(0)
+
