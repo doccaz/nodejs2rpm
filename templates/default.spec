@@ -1,5 +1,5 @@
 %define base_name {{ __BASENAME__ }}
-%define nodejs_dir %{_libdir}/node_modules/npm
+%define nodejs_dir %{_libdir}/node_modules/npm6
 %define nodejs_modulesdir %{nodejs_dir}/node_modules
 
 # to avoid empty debugfiles error on some distros
@@ -24,10 +24,6 @@ BuildRoot:       %{_tmppath}/%{name}-%{version}-%{release}-root
 ExclusiveArch:   %{ix86} x86_64 %{arm} noarch
 Provides:	 npm(%{base_name}) = %{version}
 AutoReqProv:	no
-Requires:	npm(code)
-Requires:	npm(errno)
-Requires:	npm(syscall)
-Requires:	npm(getaddrinfo)
 {%- if __REQUIRES__ %}
 {%- for req,ver in __REQUIRES__|dictsort %}
 Requires:	npm({{ req }}) >= {{ ver|replace('~', '')|replace('x', '0')|replace('^','') }}
