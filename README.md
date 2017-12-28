@@ -30,7 +30,7 @@ For every module you run this script on, a new directory named "nodejs-<MODULE>"
 
 You can create SPECS for a ton of modules at once in just one line, like this:
 
-  # for f in code hoek prr errno; do python -m $f -e my@email.com -c "New package"; done
+  # for f in code hoek prr errno; do ./nodejs2rpm.py -m $f -e my@email.com -c "New package"; done
 
 # tips specific to OBS
 
