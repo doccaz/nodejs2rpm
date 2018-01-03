@@ -85,7 +85,7 @@ parser.add_option("-t", "--template", type="string", dest="templatefile",
                   metavar="SPECTEMPLATE", default="default.spec")
 parser.add_option("-T", "--templatedir", type="string", dest="templatedir",
                   help="name of the SPEC template directory to use",
-                  metavar="SPECTEMPLATEDIR", default="templates")
+                  metavar="SPECTEMPLATEDIR", default="/usr/share/nodejs2rpm/templates")
 parser.add_option("-f", "--overwrite", action="store_true", dest="overwrite",
                   help="overwrite the destination directory")
 parser.add_option("-e", "--email", type="string", dest="email",
