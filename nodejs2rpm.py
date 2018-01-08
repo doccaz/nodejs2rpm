@@ -54,8 +54,24 @@ def getREADME(tar_file):
     tar.close()
     return docfile
 
+def getLICENSE(tar_file):
 
-def fillSPEC(template_file, sub_dict, docfile, output_file):
+    print "Using tarfile: " + tar_file
+    if not tarfile.is_tarfile(tar_file):
+        print "Invalid tar file!"
+        sys.exit(1)
+
+    tar = tarfile.open(tar_file, "r:gz")
+    licensefile = "none"
+    for tarinfo in tar:
+        if (tarinfo.isreg()) and (re.search('.*license$', tarinfo.name, re.I) is not None):
+            print "Found LICENSE - " + os.path.basename(tarinfo.name)
+            licensefile = os.path.basename(tarinfo.name)
+    tar.close()
+    return licensefile
+
+
+def fillSPEC(template_file, sub_dict, docfile, licensefile, output_file):
 
 
     # Initialize the Jinja environment
@@ -214,6 +230,9 @@ out.close()
 # get the README file from the tar
 docfile = getREADME(tarball)
 
+# get the LICENSE file from the tar
+licensefile = getLICENSE(tarball)
+
 # map the strings to the values to be substituted
 sub_dict = {
     '__VERSION__': meta_latest,
@@ -224,12 +243,13 @@ sub_dict = {
     '__BASENAME__': meta_name,
     '__REQUIRES__': meta_dependencies,
     '__DOC__': docfile,
+    '__LICENSE__': licensefile,
     '__BOILERPLATE__': boilerplate,
     # the metadata does not have a detailed description
     '__DESCRIPTION__': meta_desc }
 
 # substitute the variables in the SPEC template
-fillSPEC(options.templatefile, sub_dict, docfile, output)
+fillSPEC(options.templatefile, sub_dict, docfile, licensefile, output)
 
 # create the changes file if requested
 fillChanges(options.email, options.changelog, output)
