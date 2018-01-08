@@ -52,8 +52,10 @@ mv -f package.json \
 cp -prf * \
         %{buildroot}%{nodejs_modulesdir}/%{base_name}
 
+%if ! 0%{?suse_version}
 %clean
 rm -rf $RPM_BUILD_ROOT
+%endif
 
 %post 
 
@@ -77,6 +79,9 @@ fi
 %dir %{nodejs_modulesdir}
 %{nodejs_modulesdir}/%{base_name}/*
 %dir %{nodejs_modulesdir}/%{base_name}
+{%- if __LICENSE__ != "none" %}
+%license {{ __LICENSE__ }}
+{%- endif %}
 {%- if __DOC__ != "none" %}
 %doc {{ __DOC__ }}
 {%- endif %}
