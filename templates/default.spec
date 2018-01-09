@@ -8,7 +8,7 @@
 Name:            nodejs-%{base_name}
 Version:         {{ __VERSION__ }}
 Release:         0
-License:         {{ __LICENSE__ }}
+License:         {{ __LICENSEF__ }}
 Summary:         {{ __SUMMARY__ }}
 URL:             {{ __URL__|replace('git+https','https')|replace('git://','http://') }}
 Group:           Development/Languages/Other
@@ -79,8 +79,8 @@ fi
 %dir %{nodejs_modulesdir}
 %{nodejs_modulesdir}/%{base_name}/*
 %dir %{nodejs_modulesdir}/%{base_name}
-{%- if __LICENSE__ != "none" %}
-%license {{ __LICENSE__ }}
+{%- if __LICENSEF__ != "none" %}
+%license {{ __LICENSEF__ }}
 {%- endif %}
 {%- if __DOC__ != "none" %}
 %doc {{ __DOC__ }}

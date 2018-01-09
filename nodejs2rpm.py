@@ -243,7 +243,7 @@ sub_dict = {
     '__BASENAME__': meta_name,
     '__REQUIRES__': meta_dependencies,
     '__DOC__': docfile,
-    '__LICENSE__': licensefile,
+    '__LICENSEF__': licensefile,
     '__BOILERPLATE__': boilerplate,
     # the metadata does not have a detailed description
     '__DESCRIPTION__': meta_desc }
